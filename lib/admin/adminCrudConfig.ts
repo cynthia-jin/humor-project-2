@@ -279,7 +279,11 @@ const crudResources: Record<string, CrudResourceConfig> = {
   },
 };
 
-export function getCrudResourceConfig(resourceSlug: string): CrudResourceConfig | null {
+export function getCrudResourceConfig(
+  resourceSlug: string | undefined | null
+): CrudResourceConfig | null {
+  if (!resourceSlug) return null;
+
   const normalized = resourceSlug.trim().toLowerCase().replaceAll("_", "-");
   const direct = crudResources[normalized];
   if (direct) return direct;
