@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 async function createImage(formData: FormData) {
   "use server";
 
-  const { supabase } = await requireSuperadmin();
+  const { supabase, profile } = await requireSuperadmin();
 
   const url = formData.get("url")?.toString() || "";
   const additional_context =
@@ -23,6 +23,8 @@ async function createImage(formData: FormData) {
     celebrity_recognition,
     is_public,
     is_common_use,
+    created_by_user_id: profile.id,
+    modified_by_user_id: profile.id,
   });
 
   if (error) {

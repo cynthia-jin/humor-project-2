@@ -4,7 +4,7 @@ import { notFound, redirect } from "next/navigation";
 async function updateImage(id: string, formData: FormData) {
   "use server";
 
-  const { supabase } = await requireSuperadmin();
+  const { supabase, profile } = await requireSuperadmin();
 
   const url = formData.get("url")?.toString() || "";
   const additional_context =
@@ -25,7 +25,7 @@ async function updateImage(id: string, formData: FormData) {
       celebrity_recognition,
       is_public,
       is_common_use,
-      modified_datetime_utc: new Date().toISOString(),
+      modified_by_user_id: profile.id,
     })
     .eq("id", id);
 

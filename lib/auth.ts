@@ -14,7 +14,7 @@ export async function requireSuperadmin() {
 
   const { data: profile, error } = await supabase
     .from("profiles")
-    .select("is_superadmin")
+    .select("id, is_superadmin")
     .eq("id", user.id)
     .single();
 
