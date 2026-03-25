@@ -14,7 +14,14 @@ export default async function AdminResourceNew({
   params: { resource: string };
 }) {
   const config = getCrudResourceConfig(params.resource);
-  if (!config) return null;
+  if (!config) {
+    return (
+      <main className="p-8">
+        <h1 className="text-2xl font-bold mb-2">Unknown admin resource</h1>
+        <div className="text-gray-600">No CRUD config for: {params.resource}</div>
+      </main>
+    );
+  }
   const configNonNull: CrudResourceConfig = config;
 
   const { supabase } = await requireSuperadmin();

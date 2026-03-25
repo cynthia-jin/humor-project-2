@@ -280,6 +280,12 @@ const crudResources: Record<string, CrudResourceConfig> = {
 };
 
 export function getCrudResourceConfig(resourceSlug: string): CrudResourceConfig | null {
-  return crudResources[resourceSlug] ?? null;
+  // Prefer direct key lookup, but also fall back to `resourceSlug` property
+  // in case param value and object key ever diverge.
+  return (
+    crudResources[resourceSlug] ??
+    Object.values(crudResources).find((c) => c.resourceSlug === resourceSlug) ??
+    null
+  );
 }
 
