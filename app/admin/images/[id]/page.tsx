@@ -6,7 +6,30 @@ async function updateImage(id: string, formData: FormData) {
 
   const { supabase, profile } = await requireSuperadmin();
 
-  const url = formData.get("url")?.toString() || "";
+  const file = formData.get("image_file");
+  let url: string | null = null;
+  if (file && file instanceof File) {
+    const filePath = `admin-images/${id}/${Date.now()}-${file.name}`;
+    const { data: uploadData, error: uploadError } = await supabase.storage
+      .from("images")
+      .upload(filePath, file, {
+        contentType: file.type ?? undefined,
+        upsert: false,
+      });
+
+    if (uploadError) {
+      throw new Error(uploadError.message);
+    }
+
+    const { data: publicData } = supabase.storage
+      .from("images")
+      .getPublicUrl(uploadData.path);
+
+    url = publicData.publicUrl;
+  } else {
+    const existingUrl = formData.get("existing_url")?.toString() || "";
+    url = formData.get("url")?.toString() || existingUrl;
+  }
   const additional_context =
     formData.get("additional_context")?.toString() || "";
   const image_description =
@@ -76,12 +99,29 @@ export default async function EditImagePage({
       <h1 className="text-3xl font-bold mb-6">Edit Image</h1>
 
       <form action={updateImageWithId} className="space-y-4">
+        <input
+          type="hidden"
+          name="existing_url"
+          value={image.url ?? ""}
+        />
+
+        <div>
+          <label className="block mb-1 font-medium">
+            Upload New Image (optional)
+          </label>
+          <input
+            type="file"
+            name="image_file"
+            accept="image/*"
+            className="w-full"
+          />
+        </div>
+
         <div>
           <label className="block mb-1 font-medium">Image URL</label>
           <input
             name="url"
             defaultValue={image.url ?? ""}
-            required
             className="w-full rounded border p-2"
           />
         </div>

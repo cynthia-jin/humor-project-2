@@ -6,7 +6,34 @@ async function createImage(formData: FormData) {
 
   const { supabase, profile } = await requireSuperadmin();
 
-  const url = formData.get("url")?.toString() || "";
+  const file = formData.get("image_file");
+  let url: string | null = null;
+  if (file && file instanceof File) {
+    const filePath = `admin-images/${Date.now()}-${file.name}`;
+    const { data: uploadData, error: uploadError } = await supabase.storage
+      .from("images")
+      .upload(filePath, file, {
+        contentType: file.type ?? undefined,
+        upsert: false,
+      });
+
+    if (uploadError) {
+      throw new Error(uploadError.message);
+    }
+
+    const { data: publicData } = supabase.storage
+      .from("images")
+      .getPublicUrl(uploadData.path);
+
+    url = publicData.publicUrl;
+  } else {
+    url = formData.get("url")?.toString() || "";
+  }
+
+  if (!url) {
+    throw new Error("Provide either an uploaded image file or a URL.");
+  }
+
   const additional_context =
     formData.get("additional_context")?.toString() || "";
   const image_description =
@@ -43,12 +70,24 @@ export default async function NewImagePage() {
 
       <form action={createImage} className="space-y-4">
         <div>
+          <label className="block mb-1 font-medium">Upload Image (optional)</label>
+          <input
+            type="file"
+            name="image_file"
+            accept="image/*"
+            className="w-full"
+          />
+          <div className="mt-1 text-xs text-gray-500">
+            If provided, the public URL from Storage will be saved to `images.url`.
+          </div>
+        </div>
+
+        <div>
           <label className="block mb-1 font-medium">Image URL</label>
           <input
             name="url"
-            required
-            className="w-full rounded border p-2"
             placeholder="https://..."
+            className="w-full rounded border p-2"
           />
         </div>
 

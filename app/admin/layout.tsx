@@ -15,6 +15,18 @@ export default async function AdminLayout({
         <Link href="/admin/users">Users</Link>
         <Link href="/admin/images">Images</Link>
         <Link href="/admin/captions">Captions</Link>
+        <Link href="/admin/humor-flavors">Humor Flavors</Link>
+        <Link href="/admin/humor-flavor-steps">Flavor Steps</Link>
+        <Link href="/admin/humor-mix">Humor Mix</Link>
+        <Link href="/admin/llm-prompt-chains">LLM Prompt Chains</Link>
+        <Link href="/admin/llm-responses">LLM Responses</Link>
+        <Link href="/admin/terms">Terms</Link>
+        <Link href="/admin/allowed-signup-domains">Allowed Domains</Link>
+        <Link href="/admin/whitelist-email-addresses">Whitelist Emails</Link>
+        <Link href="/admin/caption-requests">Caption Requests</Link>
+        <Link href="/admin/caption-examples">Caption Examples</Link>
+        <Link href="/admin/llm-providers">LLM Providers</Link>
+        <Link href="/admin/llm-models">LLM Models</Link>
       </nav>
       {children}
     </div>
