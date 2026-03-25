@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { requireSuperadmin } from "@/lib/auth";
 import {
   getCrudResourceConfig,
+  getAllCrudResourceSlugs,
   type CrudResourceConfig,
   type SelectField,
 } from "@/lib/admin/adminCrudConfig";
@@ -18,7 +19,13 @@ export default async function AdminResourceNew({
     return (
       <main className="p-8">
         <h1 className="text-2xl font-bold mb-2">Unknown admin resource</h1>
-        <div className="text-gray-600">No CRUD config for: {params.resource}</div>
+        <div className="text-gray-600">
+          No CRUD config for: <span className="font-mono">{params.resource}</span>
+        </div>
+        <div className="mt-2 text-gray-600 text-sm">
+          Known CRUD resources:{" "}
+          <span className="font-mono">{getAllCrudResourceSlugs().join(", ")}</span>
+        </div>
       </main>
     );
   }

@@ -289,3 +289,8 @@ export function getCrudResourceConfig(resourceSlug: string): CrudResourceConfig 
   );
 }
 
+export function getAllCrudResourceSlugs(): string[] {
+  // Prefer the config's own `resourceSlug` so URL segments are always consistent
+  return Object.values(crudResources).map((c) => c.resourceSlug);
+}
+
