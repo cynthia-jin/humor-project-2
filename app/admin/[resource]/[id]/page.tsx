@@ -12,18 +12,18 @@ import { fetchSelectOptions, parseFormFieldValue } from "@/lib/admin/adminCrudUt
 export default async function AdminResourceEdit({
   params,
 }: {
-  params: { resource: string; id: string };
+  params: Promise<{ resource: string; id: string }>;
 }) {
-  const config = getCrudResourceConfig(params.resource);
+  const { resource, id } = await params;
+  const config = getCrudResourceConfig(resource);
   if (!config) {
     return (
       <main className="p-8">
         <h1 className="text-2xl font-bold mb-2">Unknown admin resource</h1>
         <div className="text-gray-600">
-          No CRUD config for: <span className="font-mono">{String(params.resource)}</span>
+          No CRUD config for: <span className="font-mono">{String(resource)}</span>
           <div className="mt-1 text-xs">
-            typeof params.resource:{" "}
-            <span className="font-mono">{typeof params.resource}</span>
+            typeof resource: <span className="font-mono">{typeof resource}</span>
           </div>
         </div>
         <div className="mt-2 text-gray-600 text-sm">
@@ -42,7 +42,7 @@ export default async function AdminResourceEdit({
   const { data: item, error: itemError } = await supabase
     .from(configNonNull.table)
     .select(selectColumns)
-    .eq(configNonNull.idColumn, params.id)
+    .eq(configNonNull.idColumn, id)
     .single();
 
   if (itemError || !item) return notFound();
@@ -75,7 +75,7 @@ export default async function AdminResourceEdit({
     const { error } = await supabase
       .from(configNonNull.table)
       .update(payload)
-      .eq(configNonNull.idColumn, params.id);
+      .eq(configNonNull.idColumn, id);
 
     if (error) {
       throw new Error(error.message);
@@ -91,7 +91,7 @@ export default async function AdminResourceEdit({
     const { error } = await supabase
       .from(configNonNull.table)
       .delete()
-      .eq(configNonNull.idColumn, params.id);
+      .eq(configNonNull.idColumn, id);
 
     if (error) {
       throw new Error(error.message);
@@ -113,7 +113,7 @@ export default async function AdminResourceEdit({
 
       <form action={updateResource} className="space-y-4">
         <div className="rounded-xl border p-4 bg-gray-50 text-xs text-gray-600">
-          Editing ID: <span className="font-mono">{params.id}</span>
+          Editing ID: <span className="font-mono">{id}</span>
         </div>
 
         {configNonNull.formFields.map((field) => {
@@ -211,7 +211,7 @@ export default async function AdminResourceEdit({
             Save Changes
           </button>
           <Link
-            href={`/admin/${configNonNull.resourceSlug}/${params.id}`}
+            href={`/admin/${configNonNull.resourceSlug}/${id}`}
             className="rounded border px-4 py-2"
           >
             Refresh

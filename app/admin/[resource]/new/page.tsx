@@ -12,18 +12,18 @@ import { fetchSelectOptions, parseFormFieldValue } from "@/lib/admin/adminCrudUt
 export default async function AdminResourceNew({
   params,
 }: {
-  params: { resource: string };
+  params: Promise<{ resource: string }>;
 }) {
-  const config = getCrudResourceConfig(params.resource);
+  const { resource } = await params;
+  const config = getCrudResourceConfig(resource);
   if (!config) {
     return (
       <main className="p-8">
         <h1 className="text-2xl font-bold mb-2">Unknown admin resource</h1>
         <div className="text-gray-600">
-          No CRUD config for: <span className="font-mono">{String(params.resource)}</span>
+          No CRUD config for: <span className="font-mono">{String(resource)}</span>
           <div className="mt-1 text-xs">
-            typeof params.resource:{" "}
-            <span className="font-mono">{typeof params.resource}</span>
+            typeof resource: <span className="font-mono">{typeof resource}</span>
           </div>
         </div>
         <div className="mt-2 text-gray-600 text-sm">
