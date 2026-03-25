@@ -20,7 +20,8 @@ export default async function AdminResourceEdit({
       <main className="p-8">
         <h1 className="text-2xl font-bold mb-2">Unknown admin resource</h1>
         <div className="text-gray-600">
-          No CRUD config for: <span className="font-mono">{params.resource}</span>
+          No CRUD config for:{" "}
+          <span className="font-mono">{JSON.stringify(params.resource)}</span>
         </div>
         <div className="mt-2 text-gray-600 text-sm">
           Known CRUD resources:{" "}

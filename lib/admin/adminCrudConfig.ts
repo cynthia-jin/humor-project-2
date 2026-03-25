@@ -280,11 +280,17 @@ const crudResources: Record<string, CrudResourceConfig> = {
 };
 
 export function getCrudResourceConfig(resourceSlug: string): CrudResourceConfig | null {
+  const normalized = resourceSlug.trim().toLowerCase().replaceAll("_", "-");
+  const direct = crudResources[normalized];
+  if (direct) return direct;
+
   // Prefer direct key lookup, but also fall back to `resourceSlug` property
   // in case param value and object key ever diverge.
   return (
-    crudResources[resourceSlug] ??
-    Object.values(crudResources).find((c) => c.resourceSlug === resourceSlug) ??
+    direct ??
+    Object.values(crudResources).find(
+      (c) => c.resourceSlug.trim().toLowerCase().replaceAll("_", "-") === normalized
+    ) ??
     null
   );
 }
