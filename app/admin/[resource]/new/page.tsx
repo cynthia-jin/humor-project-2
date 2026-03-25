@@ -20,8 +20,11 @@ export default async function AdminResourceNew({
       <main className="p-8">
         <h1 className="text-2xl font-bold mb-2">Unknown admin resource</h1>
         <div className="text-gray-600">
-          No CRUD config for:{" "}
-          <span className="font-mono">{JSON.stringify(params.resource)}</span>
+          No CRUD config for: <span className="font-mono">{String(params.resource)}</span>
+          <div className="mt-1 text-xs">
+            typeof params.resource:{" "}
+            <span className="font-mono">{typeof params.resource}</span>
+          </div>
         </div>
         <div className="mt-2 text-gray-600 text-sm">
           Known CRUD resources:{" "}
