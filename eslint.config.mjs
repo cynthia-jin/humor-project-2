@@ -13,6 +13,15 @@ const eslintConfig = defineConfig([
     "build/**",
     "next-env.d.ts",
   ]),
+  {
+    rules: {
+      // Supabase rows aren't typed (no generated types); admin code uses
+      // `any` for row callbacks throughout. Don't error on it.
+      "@typescript-eslint/no-explicit-any": "off",
+      // Internal admin tool — plain <img> is fine, next/image is overkill.
+      "@next/next/no-img-element": "off",
+    },
+  },
 ]);
 
 export default eslintConfig;

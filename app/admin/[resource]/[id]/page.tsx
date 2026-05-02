@@ -4,10 +4,31 @@ import { requireSuperadmin } from "@/lib/auth";
 import {
   getCrudResourceConfig,
   getAllCrudResourceSlugs,
-  type CrudResourceConfig,
   type SelectField,
 } from "@/lib/admin/adminCrudConfig";
 import { fetchSelectOptions, parseFormFieldValue } from "@/lib/admin/adminCrudUtils";
+import DeleteConfirmButton from "../../DeleteConfirmButton";
+import SubmitButton from "../../SubmitButton";
+import {
+  inputClass,
+  checkboxClass,
+  buttonSecondaryClass,
+} from "@/lib/admin/styles";
+
+function FieldLabel({
+  text,
+  required,
+}: {
+  text: string;
+  required?: boolean;
+}) {
+  return (
+    <label className="block mb-1 font-medium text-gray-200">
+      {text}
+      {required ? <span className="text-red-400 ml-1">*</span> : null}
+    </label>
+  );
+}
 
 export default async function AdminResourceEdit({
   params,
@@ -20,13 +41,13 @@ export default async function AdminResourceEdit({
     return (
       <main className="p-8">
         <h1 className="text-2xl font-bold mb-2">Unknown admin resource</h1>
-        <div className="text-gray-600">
+        <div className="text-gray-300">
           No CRUD config for: <span className="font-mono">{String(resource)}</span>
-          <div className="mt-1 text-xs">
+          <div className="mt-1 text-xs text-gray-400">
             typeof resource: <span className="font-mono">{typeof resource}</span>
           </div>
         </div>
-        <div className="mt-2 text-gray-600 text-sm">
+        <div className="mt-2 text-gray-400 text-sm">
           Known CRUD resources:{" "}
           <span className="font-mono">{getAllCrudResourceSlugs().join(", ")}</span>
         </div>
@@ -102,33 +123,37 @@ export default async function AdminResourceEdit({
 
   return (
     <main className="p-8 max-w-2xl">
-      <div className="mb-6 flex items-center justify-between gap-4">
-        <h1 className="text-3xl font-bold">
-          Edit {configNonNull.resourceSlug.replaceAll("-", " ")}
-        </h1>
-        <Link href={`/admin/${configNonNull.resourceSlug}`} className="underline">
-          Back
-        </Link>
+      <div className="mb-6">
+        <div className="flex items-center justify-between gap-4">
+          <h1 className="text-3xl font-bold capitalize">
+            Edit {configNonNull.resourceSlug.replaceAll("-", " ")}
+          </h1>
+          <Link
+            href={`/admin/${configNonNull.resourceSlug}`}
+            className="underline text-indigo-400 hover:text-indigo-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 rounded"
+          >
+            Back to list
+          </Link>
+        </div>
+        <div className="mt-1 text-xs text-gray-500 font-mono break-all">
+          ID: {id}
+        </div>
       </div>
 
       <form action={updateResource} className="space-y-4">
-        <div className="rounded-xl border p-4 bg-gray-50 text-xs text-gray-600">
-          Editing ID: <span className="font-mono">{id}</span>
-        </div>
-
         {configNonNull.formFields.map((field) => {
           const value = (item as unknown as Record<string, unknown>)[field.name];
 
           if (field.kind === "text") {
             return (
               <div key={field.name}>
-                <label className="block mb-1 font-medium">{field.label}</label>
+                <FieldLabel text={field.label} required={field.required} />
                 <input
                   type="text"
                   name={field.name}
                   defaultValue={(value as string | null) ?? ""}
                   required={field.required}
-                  className="w-full rounded border p-2"
+                  className={inputClass}
                 />
               </div>
             );
@@ -137,13 +162,13 @@ export default async function AdminResourceEdit({
           if (field.kind === "textarea") {
             return (
               <div key={field.name}>
-                <label className="block mb-1 font-medium">{field.label}</label>
+                <FieldLabel text={field.label} required={field.required} />
                 <textarea
                   name={field.name}
                   defaultValue={(value as string | null) ?? ""}
                   required={field.required}
                   rows={field.rows ?? 4}
-                  className="w-full rounded border p-2"
+                  className={inputClass}
                 />
               </div>
             );
@@ -154,7 +179,7 @@ export default async function AdminResourceEdit({
               typeof value === "number" ? value : value == null ? "" : String(value);
             return (
               <div key={field.name}>
-                <label className="block mb-1 font-medium">{field.label}</label>
+                <FieldLabel text={field.label} required={field.required} />
                 <input
                   type="number"
                   name={field.name}
@@ -162,7 +187,7 @@ export default async function AdminResourceEdit({
                   required={field.required}
                   step={field.step}
                   min={field.min}
-                  className="w-full rounded border p-2"
+                  className={inputClass}
                 />
               </div>
             );
@@ -175,8 +200,9 @@ export default async function AdminResourceEdit({
                   type="checkbox"
                   name={field.name}
                   defaultChecked={value === true}
+                  className={checkboxClass}
                 />
-                <label className="font-medium">{field.label}</label>
+                <label className="font-medium text-gray-200">{field.label}</label>
               </div>
             );
           }
@@ -185,15 +211,16 @@ export default async function AdminResourceEdit({
           const options = optionsByFieldName.get(selectField.name) ?? [];
           const allowNull = selectField.nullOnEmpty ?? false;
           const selectValue = value == null ? "" : String(value);
+          const selectRequired = !!selectField.required && !allowNull;
 
           return (
             <div key={field.name}>
-              <label className="block mb-1 font-medium">{field.label}</label>
+              <FieldLabel text={field.label} required={selectRequired} />
               <select
                 name={field.name}
-                required={!!selectField.required && !allowNull}
+                required={selectRequired}
                 defaultValue={selectValue}
-                className="w-full rounded border p-2"
+                className={inputClass}
               >
                 {allowNull && <option value="">None</option>}
                 {options.map((opt) => (
@@ -206,24 +233,30 @@ export default async function AdminResourceEdit({
           );
         })}
 
-        <div className="flex gap-3">
-          <button className="rounded bg-black px-4 py-2 text-white">
-            Save Changes
-          </button>
+        <div className="flex gap-3 pt-2">
+          <SubmitButton label="Save Changes" pendingLabel="Saving…" />
           <Link
-            href={`/admin/${configNonNull.resourceSlug}/${id}`}
-            className="rounded border px-4 py-2"
+            href={`/admin/${configNonNull.resourceSlug}`}
+            className={buttonSecondaryClass}
           >
-            Refresh
+            Cancel
           </Link>
         </div>
       </form>
 
-      <form action={deleteResource} className="mt-6">
-        <button className="rounded bg-red-600 px-4 py-2 text-white">
-          Delete
-        </button>
-      </form>
+      <div className="mt-10 pt-6 border-t border-gray-800">
+        <div className="text-xs uppercase tracking-wider text-gray-500 mb-2">
+          Danger zone
+        </div>
+        <form action={deleteResource}>
+          <DeleteConfirmButton
+            message={`Delete this ${configNonNull.resourceSlug.replaceAll(
+              "-",
+              " "
+            )} row? This cannot be undone.`}
+          />
+        </form>
+      </div>
     </main>
   );
 }

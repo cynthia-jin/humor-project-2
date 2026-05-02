@@ -1,4 +1,5 @@
 import { requireSuperadmin } from "@/lib/auth";
+import { formatTimestamp } from "@/lib/admin/format";
 
 export default async function AdminDashboardPage() {
   const { supabase } = await requireSuperadmin();
@@ -163,12 +164,13 @@ export default async function AdminDashboardPage() {
   ];
 
   return (
-    <main className="p-8">
+    <main className="p-8 max-w-7xl mx-auto">
       <div className="flex items-center justify-between gap-4 mb-6">
         <h1 className="text-3xl font-bold">Admin Dashboard</h1>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-8 gap-4">
+      <h2 className="text-xl font-semibold mb-4 text-gray-100">Platform</h2>
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
         {stats.map((stat) => (
           <div
             key={stat.label}
@@ -187,7 +189,7 @@ export default async function AdminDashboardPage() {
           Caption ratings
         </h2>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-8 gap-4 mb-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 mb-4">
           {ratingStats.map((stat) => (
             <div
               key={stat.label}
@@ -272,7 +274,7 @@ export default async function AdminDashboardPage() {
                   {(topCaptions ?? []).map((c: any) => (
                     <tr key={c.id} className="border-t border-gray-800">
                       <td className="p-2 text-gray-200">
-                        <div className="max-w-[340px] break-all">
+                        <div className="max-w-[340px] line-clamp-2">
                           {c.content ?? "-"}
                         </div>
                       </td>
@@ -359,14 +361,19 @@ export default async function AdminDashboardPage() {
                 <tbody>
                   {(recentUsers ?? []).map((u) => (
                     <tr key={u.id} className="border-t border-gray-800">
-                      <td className="p-2 text-gray-200 break-all">
-                        {u.email ?? "-"}
+                      <td className="p-2 text-gray-200">
+                        <div className="truncate max-w-[220px]" title={u.email ?? ""}>
+                          {u.email ?? "-"}
+                        </div>
                       </td>
                       <td className="p-2 text-gray-200">
                         {u.is_superadmin ? "Superadmin" : "User"}
                       </td>
-                      <td className="p-2 text-gray-400">
-                        {u.created_datetime_utc}
+                      <td
+                        className="p-2 text-gray-400 whitespace-nowrap"
+                        title={u.created_datetime_utc ?? ""}
+                      >
+                        {formatTimestamp(u.created_datetime_utc)}
                       </td>
                     </tr>
                   ))}
@@ -404,11 +411,16 @@ export default async function AdminDashboardPage() {
                           </div>
                         )}
                       </td>
-                      <td className="p-2 text-gray-200 break-all max-w-[260px]">
-                        {img.url ?? "-"}
+                      <td className="p-2 text-gray-300 max-w-[260px]">
+                        <div className="truncate" title={img.url ?? ""}>
+                          {img.url ?? "-"}
+                        </div>
                       </td>
-                      <td className="p-2 text-gray-400">
-                        {img.created_datetime_utc}
+                      <td
+                        className="p-2 text-gray-400 whitespace-nowrap"
+                        title={img.created_datetime_utc ?? ""}
+                      >
+                        {formatTimestamp(img.created_datetime_utc)}
                       </td>
                     </tr>
                   ))}
@@ -434,13 +446,18 @@ export default async function AdminDashboardPage() {
                   {(recentCaptions ?? []).map((c) => (
                     <tr key={c.id} className="border-t border-gray-800">
                       <td className="p-2 text-gray-200">
-                        <div className="max-w-[340px] break-all">
+                        <div className="max-w-[340px] line-clamp-2">
                           {c.content ?? "-"}
                         </div>
                       </td>
-                      <td className="p-2 text-gray-200">{c.like_count}</td>
-                      <td className="p-2 text-gray-400">
-                        {c.created_datetime_utc}
+                      <td className="p-2 text-gray-200 tabular-nums">
+                        {c.like_count}
+                      </td>
+                      <td
+                        className="p-2 text-gray-400 whitespace-nowrap"
+                        title={c.created_datetime_utc ?? ""}
+                      >
+                        {formatTimestamp(c.created_datetime_utc)}
                       </td>
                     </tr>
                   ))}

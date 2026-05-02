@@ -8,6 +8,27 @@ import {
   type SelectField,
 } from "@/lib/admin/adminCrudConfig";
 import { fetchSelectOptions, parseFormFieldValue } from "@/lib/admin/adminCrudUtils";
+import SubmitButton from "../../SubmitButton";
+import {
+  inputClass,
+  checkboxClass,
+  buttonSecondaryClass,
+} from "@/lib/admin/styles";
+
+function FieldLabel({
+  text,
+  required,
+}: {
+  text: string;
+  required?: boolean;
+}) {
+  return (
+    <label className="block mb-1 font-medium text-gray-200">
+      {text}
+      {required ? <span className="text-red-400 ml-1">*</span> : null}
+    </label>
+  );
+}
 
 export default async function AdminResourceNew({
   params,
@@ -20,13 +41,13 @@ export default async function AdminResourceNew({
     return (
       <main className="p-8">
         <h1 className="text-2xl font-bold mb-2">Unknown admin resource</h1>
-        <div className="text-gray-600">
+        <div className="text-gray-300">
           No CRUD config for: <span className="font-mono">{String(resource)}</span>
-          <div className="mt-1 text-xs">
+          <div className="mt-1 text-xs text-gray-400">
             typeof resource: <span className="font-mono">{typeof resource}</span>
           </div>
         </div>
-        <div className="mt-2 text-gray-600 text-sm">
+        <div className="mt-2 text-gray-400 text-sm">
           Known CRUD resources:{" "}
           <span className="font-mono">{getAllCrudResourceSlugs().join(", ")}</span>
         </div>
@@ -100,13 +121,13 @@ export default async function AdminResourceNew({
           if (field.kind === "text") {
             return (
               <div key={field.name}>
-                <label className="block mb-1 font-medium">{field.label}</label>
+                <FieldLabel text={field.label} required={field.required} />
                 <input
                   type="text"
                   name={field.name}
                   placeholder={field.placeholder}
                   required={field.required}
-                  className="w-full rounded border p-2"
+                  className={inputClass}
                 />
               </div>
             );
@@ -115,13 +136,13 @@ export default async function AdminResourceNew({
           if (field.kind === "textarea") {
             return (
               <div key={field.name}>
-                <label className="block mb-1 font-medium">{field.label}</label>
+                <FieldLabel text={field.label} required={field.required} />
                 <textarea
                   name={field.name}
                   placeholder={field.placeholder}
                   required={field.required}
                   rows={field.rows ?? 4}
-                  className="w-full rounded border p-2"
+                  className={inputClass}
                 />
               </div>
             );
@@ -130,7 +151,7 @@ export default async function AdminResourceNew({
           if (field.kind === "number") {
             return (
               <div key={field.name}>
-                <label className="block mb-1 font-medium">{field.label}</label>
+                <FieldLabel text={field.label} required={field.required} />
                 <input
                   type="number"
                   name={field.name}
@@ -138,7 +159,7 @@ export default async function AdminResourceNew({
                   required={field.required}
                   step={field.step}
                   min={field.min}
-                  className="w-full rounded border p-2"
+                  className={inputClass}
                 />
               </div>
             );
@@ -147,8 +168,12 @@ export default async function AdminResourceNew({
           if (field.kind === "boolean") {
             return (
               <div key={field.name} className="flex items-center gap-2">
-                <input type="checkbox" name={field.name} />
-                <label className="font-medium">{field.label}</label>
+                <input
+                  type="checkbox"
+                  name={field.name}
+                  className={checkboxClass}
+                />
+                <label className="font-medium text-gray-200">{field.label}</label>
               </div>
             );
           }
@@ -160,12 +185,12 @@ export default async function AdminResourceNew({
 
           return (
             <div key={field.name}>
-              <label className="block mb-1 font-medium">{field.label}</label>
+              <FieldLabel text={field.label} required={required} />
               <select
                 name={field.name}
                 required={required}
                 defaultValue=""
-                className="w-full rounded border p-2"
+                className={inputClass}
               >
                 {allowNull && <option value="">None</option>}
                 {options.map((opt) => (
@@ -178,13 +203,11 @@ export default async function AdminResourceNew({
           );
         })}
 
-        <div className="flex gap-3">
-          <button className="rounded bg-black px-4 py-2 text-white">
-            Create
-          </button>
+        <div className="flex gap-3 pt-2">
+          <SubmitButton label="Create" pendingLabel="Creating…" />
           <Link
             href={`/admin/${configNonNull.resourceSlug}`}
-            className="rounded border px-4 py-2"
+            className={buttonSecondaryClass}
           >
             Cancel
           </Link>

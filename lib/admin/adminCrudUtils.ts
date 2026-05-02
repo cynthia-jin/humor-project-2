@@ -21,7 +21,6 @@ export async function fetchSelectOptions(
   if (error) {
     // Avoid crashing the entire admin page if dropdown data fails to load
     // (e.g. RLS/permissions). The UI will simply render an empty select.
-    // eslint-disable-next-line no-console
     console.error(
       `Failed to load select options for ${field.name} from ${field.options.table}:`,
       error.message

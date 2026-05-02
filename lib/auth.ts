@@ -16,7 +16,6 @@ export async function requireSuperadmin() {
   // but the `profiles` row has not been created/updated yet (DB triggers, etc.).
   // A small retry avoids the "click login twice" symptom.
   let profile: { id: string; is_superadmin: boolean } | null = null;
-  let lastError: Error | null = null;
 
   for (let attempt = 0; attempt < 3; attempt++) {
     const { data, error } = await supabase
@@ -30,12 +29,7 @@ export async function requireSuperadmin() {
       break;
     }
 
-    if (error) {
-      lastError = new Error(error.message);
-    }
-
     // Simple backoff between retries.
-    // eslint-disable-next-line no-await-in-loop
     await new Promise((r) => setTimeout(r, 250 * (attempt + 1)));
   }
 
